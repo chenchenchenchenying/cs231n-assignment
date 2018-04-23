@@ -25,31 +25,33 @@ def svm_loss_naive(W, X, y, reg):
   num_classes = W.shape[1]
   num_train = X.shape[0]
   loss = 0.0
-  for i in xrange(num_train):
+  for i in range(num_train):
     scores = X[i].dot(W)
     correct_class_score = scores[y[i]]
-    for j in xrange(num_classes):
+    for j in range(num_classes):
       if j == y[i]:
         continue
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
-
+        dW[:,j] += X[i]    # dW: 3073x10, 此处的值为3073x1,放在dW第j列，dW[:,j]只需加一次，外循环再循环500次
+        dW[:,y[i]] -= X[i]  #dW[:,y[i]要加9次，除非有margin<0;外循环再循环500次
+        
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
   loss /= num_train
-
+  dW /= num_train
   # Add regularization to the loss.
   loss += 0.5 * reg * np.sum(W * W)
-
-  #############################################################################
-  # TODO:                                                                     #
-  # Compute the gradient of the loss function and store it dW.                #
+  dW += reg*W
+  ##############################################################################
+  # TODO:                                               #
+  # Compute the gradient of the loss function and store it in dW.          #
   # Rather that first computing the loss and then computing the derivative,   #
-  # it may be simpler to compute the derivative at the same time that the     #
+  # it may be simpler to compute the derivative at the same time that the           
   # loss is being computed. As a result you may need to modify some of the    #
-  # code above to compute the gradient.                                       #
-  #############################################################################
+  # code above to compute the gradient.                           #
+  ##############################################################################
 
 
   return loss, dW
